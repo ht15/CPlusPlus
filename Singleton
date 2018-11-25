@@ -1,0 +1,53 @@
+#include<iostream>
+using namespace std;
+template<class T>
+T MyMin(T x, T y){
+	return x<y?x:y;
+}
+
+template<typename T>
+class Singleton
+{
+public:
+	static T *instance;
+	Singleton(){}
+	static T* GetInstance()
+	{
+		if(instance == NULL)
+			instance = new T();
+		return instance;
+	}
+	~Singleton()
+	{
+		if(instance != NULL)
+		{
+			printf("call ~Singleton\n");
+			//delete instance;   //这里不能delete 否则会重复delete， 因为这个析构函数的调用时机正是instance被delete了（或者说析构了）
+			instance = NULL;
+		}
+	}
+};
+template<typename T>  T* Singleton<T>:: instance = NULL;
+
+class TemplateTest: public Singleton<TemplateTest>
+{
+public:
+	TemplateTest(): Singleton<TemplateTest>()
+	{
+		cout<<"create TemplateTest succeed"<<endl;
+	}
+};
+
+int main(int argc, char const *argv[])
+{
+	cout<<min(3,4)<<endl;
+	TemplateTest* p1 = TemplateTest::GetInstance();
+	TemplateTest* p2 = TemplateTest::GetInstance();
+	cout<<p1<<endl;
+	//delete p1;  //这里如果delete，则会在delete p2时重复delete
+	p1 = NULL;
+	cout<<p2<<endl;
+	delete p2;
+	p2 = NULL;
+	return 0 ;
+}
