@@ -1,0 +1,16 @@
+#include <iostream>
+#include <string>
+
+class Printer{
+public:
+    Printer(){};
+    void operator()(const std::string & str)const{
+        std::cout<<str<<std::endl;
+    }    
+};
+
+int main(int atgc,char * argv[]){
+    Printer print;
+    print("hello world!");
+    return 0;
+}
