@@ -1,0 +1,26 @@
+#include<iostream>
+#include<functional>
+#include<vector>
+using namespace std;
+
+typedef function<int (int, int)>  callback1;
+typedef int(*callback2)(int, int);
+
+int TestFunctional1(callback1 cb, int a, int b)
+{
+	printf("this is TestFunctional1\n");
+	return cb(a, b);
+}
+
+int TestFunctional2(callback2 cb, int a, int b)
+{
+	printf("this is TestFunctional2\n");
+	return cb(a, b);
+}
+
+int main(int argc, char const *argv[])
+{
+	cout<<TestFunctional1([](int a, int b) -> int{return a + b;}, 1, 3)<<endl;
+	cout<<TestFunctional2([](int a, int b) -> int{return a + b;}, 2, 3)<<endl;
+	return 0;
+}
