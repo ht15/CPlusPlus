@@ -1,0 +1,28 @@
+#include<iostream>
+using namespace std;
+
+class NoExplicit{
+ 	int val;
+public:
+ 	NoExplicit(int n){val =n;}
+ 	void Echo(){printf("%d\n", val);}
+ };
+
+ class Explicit{
+ 	int val;
+ public:
+ 	explicit Explicit(int n){val = n;}
+ 	void Echo()
+ 	{
+ 		printf("%d\n",val);
+ 	}
+ };
+
+ int main(){
+ 	NoExplicit ne = 2;
+  	ne.Echo();
+  	//Explicit e = 1;
+  	//e.Echo();
+  	return 0;
+ }
+  
