@@ -28,4 +28,8 @@
 		//va_arg(args, int) 可以设置不定参数的类型
 		va_end(args)  //清理工作
 	其中__FILE__为当前文件名的宏定义，__LINE__为行号，__func__为函数名，__VA_ARGS__为不定长参数
+4. printf,sprintf,snprintf   #include<stdio.h>
+	printf: 向控制台输出
+	sprintf(char* dest,char* source) :把source写进dest
+	snprintf(char* dest, int n, char*source): 写进source的前n-1个字符（gcc)
 		
