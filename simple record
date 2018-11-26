@@ -4,4 +4,11 @@
                                            #define __HEAD_H
                                            
                                            #endif
+                                       或者#pragma once
   链接期的重复定义则不能消除，因为每个源文件单独编译，在链接期才会出问题
+  
+ 2. 智能指针 #include<memory>
+  shared_ptr<TemplateTest> s_p1(TemplateTest::GetInstance());
+	shared_ptr<TemplateTest> s_p2(s_p1);
+  //shared_ptr<TemplateTest> s_p2(TemplateTest::GetInstance());  //两者所得结果不同
+	printf("s_p1: %d\n, s_p2: %d\n", s_p1.use_count(), s_p2.use_count());
