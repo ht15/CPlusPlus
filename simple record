@@ -7,8 +7,25 @@
                                        或者#pragma once
   链接期的重复定义则不能消除，因为每个源文件单独编译，在链接期才会出问题
   
- 2. 智能指针 #include<memory>
-  shared_ptr<TemplateTest> s_p1(TemplateTest::GetInstance());
+2. 智能指针 #include<memory>
+  	shared_ptr<TemplateTest> s_p1(TemplateTest::GetInstance());
 	shared_ptr<TemplateTest> s_p2(s_p1);
-  //shared_ptr<TemplateTest> s_p2(TemplateTest::GetInstance());  //两者所得结果不同
+  	//shared_ptr<TemplateTest> s_p2(TemplateTest::GetInstance());  //两者所得结果不同
 	printf("s_p1: %d\n, s_p2: %d\n", s_p1.use_count(), s_p2.use_count());
+
+3. 不定参数与c++内置宏定义
+	#define hlog(level, ...) \
+    do { \
+        if (level<=Logger::getLogger().getLogLevel()) { \
+            Logger::getLogger().logv(level, __FILE__, __LINE__, __func__, __VA_ARGS__); \
+        } \
+    } while(0)
+	Logger::logv(int level, const char* file, int line, const char* func, const char* fmt ...); // 貌似只有gcc可以 fmt ...这样表示
+	其中...表示不定参数，使用方法一般如下：
+		#include <stdarg.h>
+		va_list args;
+		va_start(args, fmt) // fmt用来标识不定参数的起始
+		//va_arg(args, int) 可以设置不定参数的类型
+		va_end(args)  //清理工作
+	其中__FILE__为当前文件名的宏定义，__LINE__为行号，__func__为函数名，__VA_ARGS__为不定长参数
+		
