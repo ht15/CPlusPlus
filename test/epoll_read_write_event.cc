@@ -19,6 +19,14 @@
 
 using namespace std;
 
+enum ConnState{
+	Invalid = 1,
+	Handshaking,
+	Connected,
+	Closed,
+	Failed,
+};
+
 void setnonblocking(int sock)
 {
     int opts;
@@ -93,9 +101,6 @@ public:
 	            }
 	            else if(events[i].events&POLLIN)
 	            {
-	            	count ++;
-	            	if(count >50)
-	            		break;
 	                cout << "server EPOLLIN#######" << endl;
 	                int iConnSock = events[i].data.fd;      // 用于通信的socket
 					char szBuf[1024] = {0};
@@ -104,6 +109,7 @@ public:
 	                if (recvLen > 0) 
 					{  
 	                    printf("recv data [%s] from fd [%d]\n", szBuf, iConnSock);
+
 	                    fflush(stdout);
 	                }
 					else if(0 == recvLen)
@@ -112,67 +118,19 @@ public:
 	                    epoll_ctl(efd, EPOLL_CTL_DEL, iConnSock, &ev);
 	                    close(iConnSock);
 	                    printf("connection closed, local fd is [%d]\n", iConnSock);
+	                    fflush(stdout);
 		            }
 		        }
 	            else if(events[i].events&POLLOUT) // 如果有数据发送
 	            {
-	            	count++;
-	            	if(count>50)
-	            		break;
-	             	cout<< "server EPOLLOUT########" <<endl;
+
+	             	//cout<< "server EPOLLOUT########" <<endl;
 	            }
 	        }
 		}
 	}
 };
 
-class TcpConn{
-	int efd;
-	int nfds;
-public:
-	void myconnect(short port){
-		int sockClient = socket(AF_INET, SOCK_STREAM, 0);
-		setnonblocking(sockClient);
-		struct sockaddr_in addrSrv;
-		addrSrv.sin_addr.s_addr = inet_addr("127.0.0.1");
-		addrSrv.sin_family = AF_INET;
-		addrSrv.sin_port = htons(port);
-		int r = connect(sockClient, ( const struct sockaddr *)&addrSrv, sizeof(struct sockaddr_in));
-		if(r != 0 && errno != EINPROGRESS){ //when set nonblocking, connect will return -1 with errno = EINPROGRESS
-			cout << "client connect error, r:"  <<r<<endl;
-			close(sockClient);
-			return;
-		}
-		cout<<"connect"<<endl;
-		// efd = epoll_create1(EPOLL_CLOEXEC);
-		// struct epoll_event ev, events[20];
-		// memset(&ev, 0, sizeof(ev));
-		// ev.events = POLLOUT|POLLIN;
-		// ev.data.fd = sockClient;
-		// r = epoll_ctl(efd, EPOLL_CTL_ADD, sockClient, &ev);
-		// clock_t start;
-		// start = clock();
-		// while(true){
-		// 	if((clock() - start)> 5){
-		// 		cout<<"close client, time:" << clock()<<endl;
-		// 		break;
-		// 	}
-		// 	nfds=epoll_wait(efd,events,20,500);
-	 //        for(int i=0;i<nfds;++i)
-	 //        {
-	 //            if(events[i].events&POLLIN)
-	 //            {
-	 //                cout << "Client EPOLLIN!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
-	 //            }
-	 //            else if(events[i].events&POLLOUT) // writable
-	 //            {
-	 //             	cout<< "Client EPOLLOUT-----------------------------------------------" <<endl;
-	 //            }
-	 //        }
-	 //    }
-
-	}
-};
 
 int main(){
 	int pid =1;

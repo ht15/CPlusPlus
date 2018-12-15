@@ -19,6 +19,13 @@
 
 using namespace std;
 
+enum ConnState{
+	Invalid = 1,
+	Handshaking,
+	Connected,
+	Closed,
+	Failed,
+};
 void setnonblocking(int sock)
 {
     int opts;
@@ -40,6 +47,7 @@ void setnonblocking(int sock)
 class TcpConn{
 	int efd;
 	int nfds;
+	ConnState state_;
 public:
 	void myconnect(short port){
 		int sockClient = socket(AF_INET, SOCK_STREAM, 0);
@@ -49,6 +57,7 @@ public:
 		addrSrv.sin_family = AF_INET;
 		addrSrv.sin_port = htons(port);
 		int r = connect(sockClient, ( const struct sockaddr *)&addrSrv, sizeof(struct sockaddr_in));
+		state_ = Handshaking;
 		if(r != 0 && errno != EINPROGRESS){ //when set nonblocking, connect will return -1 with errno = EINPROGRESS
 			cout << "client connect error, r:"  <<r<<endl;
 			close(sockClient);
@@ -78,10 +87,12 @@ public:
 				    pfd.events = POLLOUT | POLLERR;
 				    int r = poll(&pfd, 1, 0); 
 				    if (r == 1 && pfd.revents == POLLOUT) {  // Determine if server is available
+				    	state_ = Connected;
         				cout << "Client EPOLLIN!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
         			}
         			else{
         				cout << "Client:  server not available!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+        				state_ = Failed;
         				struct epoll_event ev;
 						memset(&ev, 0, sizeof(ev));
         				ev.data.fd = pfd.fd;
@@ -93,7 +104,10 @@ public:
 	            }
 	            else if(events[i].events&POLLOUT) // writable
 	            {
-	             	cout<< "Client EPOLLOUT-----------------------------------------------" <<endl;
+	            	if(state_ == Handshaking){
+	            		state_ = Connected;
+	            		cout<< "Client EPOLLOUT, Connected-----------------------------------------------" <<endl;
+	            	}
 	            }
 	        }
 	    }
