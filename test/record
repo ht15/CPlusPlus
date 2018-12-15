@@ -1,0 +1,6 @@
+1. EPOLL相关笔记
+	须知：
+		使用epoll监听一个socket时，当该socket不可用时，epoll会一直返回POLLIN可读事件，这里可以判断下可读数据是否为空，如果为空就可以认为当前连接已经关闭。
+		当前三次握手成功后，该socket会一直返回POLLOUT可写事件，所以可以自己模拟一个三次握手的过程，当accept（或connect）一个socket时将状态设置为handshaking，当一次处理可写事件时，将状态设置为conneted。之后，在处理可写时，若当前状态为conneted，则将socket设置为POLLIN only。
+	使用EPOLL一般需要将socket设置为noblocking. 但是这里会有一个坑，就是设置为noblocking后connect会返回-1.一般来说返回-1代表连接未成功，这里不然，需要判断下errno是否为EINPROGRESS，不满足一般就是连接出错了，满足以上条件也还不能确定真的建立好了连接，此外还需要判断当前是否可读：一般使用poll进行判断。
+
