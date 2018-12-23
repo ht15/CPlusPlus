@@ -2,7 +2,6 @@
 #include <poll.h>
 #include <unistd.h>
 #include "handy_imp.h"
-#include "channel.h"
 
 namespace dis_server {
 	const int kMaxEvents = 2000;

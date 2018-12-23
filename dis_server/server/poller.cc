@@ -2,6 +2,7 @@
 #include <sys/epoll.h>
 #include <set>
 #include <memory.h>
+#include "gate.h"
 
 namespace dis_server {
 
