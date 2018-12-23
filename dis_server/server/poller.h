@@ -1,5 +1,8 @@
 #pragma once
 #include <poll.h>
+#include <unistd.h>
+#include "handy_imp.h"
+#include "channel.h"
 
 namespace dis_server {
 	const int kMaxEvents = 2000;
@@ -7,8 +10,11 @@ namespace dis_server {
 	const int kWriteEvent = POLLOUT;
 
 	struct PollerBase: private noncopyable {
-		void loop_once(int waitMs){}
+		virtual void loop_once(int waitMs) = 0;
+		virtual void addChannel(Channel* ch) = 0;
+		virtual void removeChannel(Channel* ch) = 0;
+		virtual void updateChannel(Channel* ch) = 0;
 	};
 
-	PollerBase* createPoller(){}
+	PollerBase* createPoller();
 }

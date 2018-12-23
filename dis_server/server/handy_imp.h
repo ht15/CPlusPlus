@@ -1,7 +1,6 @@
 #pragma once
 #include <memory>
 #include <functional>
-#include <utility>
 
 namespace dis_server {
 	struct Channel;
@@ -9,6 +8,8 @@ namespace dis_server {
 	struct TcpServer;
 	struct Gate;
 	struct GateImp;
+
+	typedef std::function<void()> Task;
 
 	struct noncopyable {
 	    noncopyable() {};
