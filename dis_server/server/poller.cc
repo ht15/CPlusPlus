@@ -46,7 +46,13 @@ namespace dis_server {
 	}
 
 	void PollerEpoll::removeChannel(Channel* ch) {
-		return;
+		_liveChannels.erase(ch);
+		for( int i = _lastActive; i>=0; i--) {
+			if(_activeEvs[i].data.ptr == ch) {
+				_activeEvs[i].data.ptr = nullptr;
+				break;
+			}
+		}
 	}
 
 	void PollerEpoll::updateChannel(Channel* ch) {
@@ -54,7 +60,22 @@ namespace dis_server {
 	}
 
 	void PollerEpoll::loop_once(int waitMs) {
-
-		return;
+		_lastActive = epoll_wait(_fd, _activeEvs, kMaxEvents, waitMs);
+		while(--_lastActive >= 0) {
+			Channel* ch = (Channel*) _activeEvs[_lastActive].data.ptr;
+			int events = _activeEvs[_lastActive].events
+			if(ch) {
+				if(events & (kReadEvent | POLLERR)) {
+					ch->handleRead();
+				}
+				else if(events & kWriteEvent) {
+					ch->handleWrite();
+				}
+				else {
+					printf("error\n");
+					fflush(stdout);
+				}
+			}
+		}
 	}
 }
